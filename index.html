@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MANOLIN ZK">
-<title>MANOLIN ZK RPG</title>
+<meta name="apple-mobile-web-app-title" content="MANOLIN ZK Hardcore RPG">
+<title>MANOLIN ZK Hardcore RPG</title>
 
 <style>
 html, body {
   margin: 0;
   padding: env(safe-area-inset-top) 20px 20px 20px;
   height: 100%;
-  background: #0f0f1a;
+  background: #0a0a1f;
   color: #fff;
-  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-family: Arial, sans-serif;
   overflow: hidden;
 }
 
@@ -24,36 +24,50 @@ html, body {
   flex-direction: column;
   height: 100%;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 h1 {
   text-align: center;
   margin-bottom: 10px;
-  color: #f59e0b;
+  color: #f39c12;
+  text-shadow: 1px 1px 5px #000;
 }
 
 .card {
-  background: #1c1c2e;
-  padding: 15px;
+  background: linear-gradient(145deg, #1f1f3a, #16162a);
+  padding: 18px;
   margin-bottom: 15px;
   border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
   position: relative;
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: translateY(-4px);
 }
 
 button {
-  background: #7c3aed;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
   color: white;
   border: none;
-  padding: 12px;
+  padding: 14px;
   width: 100%;
   border-radius: 10px;
   font-size: 16px;
   margin-top: 10px;
   cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+}
+button:hover {
+  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+}
+button:active {
+  transform: scale(0.97);
 }
 
 .bar {
-  background: #333;
+  background: #2d2d4a;
   height: 20px;
   border-radius: 10px;
   margin-top: 10px;
@@ -63,21 +77,22 @@ button {
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: #3b82f6;
+  background: linear-gradient(90deg, #00d2ff, #3a7bd5);
   border-radius: 10px;
-  transition: width 0.3s ease;
+  transition: width 0.5s ease-in-out;
 }
 
 .level {
   text-align: center;
   font-size: 18px;
   margin-bottom: 10px;
-  color: #facc15;
+  color: #f1c40f;
+  text-shadow: 1px 1px 5px #000;
 }
 
 .history {
-  font-size: 12px;
-  color: #aaa;
+  font-size: 13px;
+  color: #ccc;
   margin-top: 10px;
 }
 
@@ -85,23 +100,58 @@ button {
   position: absolute;
   top: -10px;
   right: 10px;
-  background: #10b981;
-  padding: 5px 10px;
+  background: #00b894;
+  padding: 6px 12px;
   border-radius: 8px;
   font-size: 12px;
   opacity: 0;
-  transition: opacity 0.5s;
+  transition: opacity 0.5s, transform 0.3s;
+  transform: translateY(-10px);
+}
+.notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Medalhas */
+.medalha {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 8px;
+  background: linear-gradient(135deg,#f1c40f,#e67e22);
+  font-size: 12px;
+  color:#000;
+  font-weight:bold;
+}
+
+.streak-bar {
+  background:#1f1f3a;
+  height:15px;
+  border-radius:10px;
+  margin-top:5px;
+  overflow:hidden;
+}
+
+.streak-progress {
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#f39c12,#e74c3c);
+  border-radius:10px;
+  transition:width 0.5s;
 }
 </style>
 </head>
 
 <body>
 <div id="app">
-  <h1>🎮 MANOLIN ZK RPG</h1>
+  <h1>🎮 MANOLIN ZK Hardcore RPG</h1>
   <div class="level" id="levelTxt">Level 1 - XP 0/100</div>
 
+  <!-- Missão Água -->
   <div class="card">
-    <h2>💧 Água - 3L</h2>
+    <h2>💧 Missão Água - 3L</h2>
+    <p>Meta: Beber 3L de água por dia.</p>
     <p id="waterAmount">0 / 3000 ml</p>
     <button onclick="addWater(250)">+250ml</button>
     <button onclick="addWater(500)">+500ml</button>
@@ -110,24 +160,47 @@ button {
     <div id="notifWater" class="notification">+XP!</div>
   </div>
 
+  <!-- Missão Academia -->
   <div class="card">
-    <h2>🏋️ Treino Academia</h2>
-    <label><input type="checkbox" id="gymCheck" onchange="completeTask('gym')"> Fiz hoje</label>
+    <h2>🏋️ Missão Academia</h2>
+    <p>Academia nos dias livres (quando não houver boxe).</p>
+    <label><input type="checkbox" id="gymCheck" onchange="completeTask('gym')"> Concluído</label>
     <div id="notifGym" class="notification">+XP!</div>
   </div>
 
+  <!-- Missão Boxe -->
   <div class="card">
-    <h2>🥊 Boxe</h2>
-    <label><input type="checkbox" id="boxCheck" onchange="completeTask('box')"> Fiz hoje</label>
+    <h2>🥊 Missão Boxe</h2>
+    <p>Treino pesado segunda, quarta e sexta às 20h.</p>
+    <label><input type="checkbox" id="boxCheck" onchange="completeTask('box')"> Concluído</label>
     <div id="notifBox" class="notification">+XP!</div>
   </div>
 
+  <!-- Missão Dieta -->
   <div class="card">
-    <h2>🍽️ Dieta</h2>
-    <label><input type="checkbox" id="mealCheck" onchange="completeTask('meal')"> Fiz todas as refeições</label>
+    <h2>🍽️ Missão Dieta</h2>
+    <p>Cumprir todas as refeições planejadas.</p>
+    <label><input type="checkbox" id="mealCheck" onchange="completeTask('meal')"> Concluído</label>
     <div id="notifMeal" class="notification">+XP!</div>
   </div>
 
+  <!-- Missão Tirzepatida -->
+  <div class="card">
+    <h2>💉 Tirzepatida (Sexta)</h2>
+    <p>Aplicar a dose correta na sexta-feira.</p>
+    <label><input type="checkbox" id="tirzepCheck" onchange="completeTask('tirzep')"> Dose aplicada</label>
+    <div id="notifTirzep" class="notification">+XP!</div>
+  </div>
+
+  <!-- Conquistas e Streak -->
+  <div class="card">
+    <h2>🏆 Conquistas & Streak</h2>
+    <div id="medals"></div>
+    <p>Streak semanal:</p>
+    <div class="streak-bar"><div id="streakProgress" class="streak-progress"></div></div>
+  </div>
+
+  <!-- Histórico -->
   <div class="card">
     <h2>📜 Histórico</h2>
     <div id="history" class="history"></div>
@@ -135,98 +208,139 @@ button {
 </div>
 
 <script>
-// ---- VARIÁVEIS ----
-let water = 0;
-const maxWater = 3000;
-let xp = 0;
-let level = 1;
-let tasks = {gym:false, box:false, meal:false};
-let history = [];
-let lastDate = "";
+// VARIÁVEIS
+let water=0;
+const maxWater=3000;
+let xp=0;
+let level=1;
+let tasks={gym:false, box:false, meal:false, tirzep:false};
+let history=[];
+let lastDate="";
+let streak=0;
+let medals=[];
 
-// ---- FUNÇÕES ----
-function showNotif(id) {
-  const el = document.getElementById(id);
-  el.style.opacity = 1;
-  setTimeout(()=>el.style.opacity=0, 1000);
+// FUNÇÕES
+function showNotif(id){
+  const el=document.getElementById(id);
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),1000);
 }
 
-function addXP(amount) {
-  xp += amount;
-  while(xp >= 100) {
+function addXP(amount){
+  xp+=amount;
+  while(xp>=100){
     level++;
-    xp -= 100;
-    showNotif('notifWater'); // efeito extra level up opcional
+    xp-=100;
+    showNotif('notifWater');
   }
-  document.getElementById("levelTxt").innerText = `Level ${level} - XP ${xp}/100`;
+  document.getElementById("levelTxt").innerText=Level ${level} - XP ${xp}/100;
 }
 
-function addWater(v) {
-  water += v;
-  if(water > maxWater) water = maxWater;
-  document.getElementById("waterAmount").innerText = `${water} / ${maxWater} ml`;
-  document.getElementById("waterBar").style.width = (water/maxWater*100)+'%';
+function addWater(v){
+  water+=v;
+  if(water>maxWater) water=maxWater;
+  document.getElementById("waterAmount").innerText=${water} / ${maxWater} ml;
+  document.getElementById("waterBar").style.width=(water/maxWater*100)+'%';
   addXP(5);
   showNotif('notifWater');
   save();
+  checkAchievements();
 }
 
-function completeTask(task) {
-  if(tasks[task] === false) {
-    tasks[task] = true;
-    addXP(20);
+function completeTask(task){
+  const today=new Date();
+  const weekday=today.getDay(); // 0=domingo,5=sexta
+  if(task==='tirzep' && weekday!==5){
+    alert("A tirzepatida só pode ser aplicada na sexta-feira!");
+    return;
+  }
+  if(tasks[task]===false){
+    tasks[task]=true;
+    addXP(task==='tirzep'?50:20);
     showNotif('notif'+task.charAt(0).toUpperCase()+task.slice(1));
     save();
+    checkAchievements();
   }
 }
 
-// ---- SALVAR E CARREGAR ----
-function save() {
-  localStorage.setItem('manolinZK', JSON.stringify({water,xp,level,tasks,history,lastDate}));
+function save(){
+  localStorage.setItem('manolinZK',JSON.stringify({water,xp,level,tasks,history,lastDate,streak,medals}));
 }
 
-function load() {
-  const state = JSON.parse(localStorage.getItem('manolinZK'));
-  if(state) {
-    ({water,xp,level,tasks,history,lastDate} = state);
-    document.getElementById("waterAmount").innerText = `${water} / ${maxWater} ml`;
-    document.getElementById("waterBar").style.width = (water/maxWater*100)+'%';
-    document.getElementById("levelTxt").innerText = `Level ${level} - XP ${xp}/100`;
-    document.getElementById("gymCheck").checked = tasks.gym;
-    document.getElementById("boxCheck").checked = tasks.box;
-    document.getElementById("mealCheck").checked = tasks.meal;
+function load(){
+  const state=JSON.parse(localStorage.getItem('manolinZK'));
+  if(state){
+    ({water,xp,level,tasks,history,lastDate,streak,medals}=state);
+    document.getElementById("waterAmount").innerText=${water} / ${maxWater} ml;
+    document.getElementById("waterBar").style.width=(water/maxWater*100)+'%';
+    document.getElementById("levelTxt").innerText=Level ${level} - XP ${xp}/100;
+    document.getElementById("gymCheck").checked=tasks.gym;
+    document.getElementById("boxCheck").checked=tasks.box;
+    document.getElementById("mealCheck").checked=tasks.meal;
+    document.getElementById("tirzepCheck").checked=tasks.tirzep;
     updateHistory();
+    updateMedals();
+    updateStreak();
   }
 }
 
-// ---- RESET DIÁRIO ----
-function checkDate() {
-  const today = new Date().toLocaleDateString();
-  if(today !== lastDate) {
-    if(lastDate) history.unshift({date:lastDate, water, tasks:{...tasks}});
-    if(history.length>7) history.pop();
+function checkDate(){
+  const today=new Date().toLocaleDateString();
+  if(today!==lastDate){
+    if(lastDate){
+      history.unshift({date:lastDate, water, tasks:{...tasks}});
+      // streak
+      if(Object.values(tasks).every(v=>v===true)) streak++; else streak=0;
+    }
+    if(history.length>14) history.pop();
     water=0;
-    tasks={gym:false, box:false, meal:false};
-    lastDate = today;
+    tasks={gym:false, box:false, meal:false, tirzep:false};
+    lastDate=today;
     save();
     load();
   }
 }
 
-// ---- HISTÓRICO ----
-function updateHistory() {
-  const hDiv = document.getElementById("history");
-  hDiv.innerHTML = "";
+function updateHistory(){
+  const hDiv=document.getElementById("history");
+  hDiv.innerHTML="";
   history.forEach(d=>{
-    hDiv.innerHTML += `<div>${d.date}: Água ${d.water}ml, Gym ${d.tasks.gym?'✔':'❌'}, Box ${d.tasks.box?'✔':'❌'}, Dieta ${d.tasks.meal?'✔':'❌'}</div>`;
+    hDiv.innerHTML+=<div>${d.date}: Água ${d.water}ml, Gym ${d.tasks.gym?'✔':'❌'}, Box ${d.tasks.box?'✔':'❌'}, Dieta ${d.tasks.meal?'✔':'❌'}, Tirzep ${d.tasks.tirzep?'✔':'❌'}</div>;
   });
 }
 
-// ---- INICIALIZAÇÃO ----
-window.onload = ()=>{
+function checkAchievements(){
+  // água streak
+  if(water>=maxWater && !medals.includes("Hidratado")) medals.push("Hidratado");
+  // boxe streak
+  if(tasks.box && !medals.includes("Punch Master")) medals.push("Punch Master");
+  // tirzep sexta
+  const d = new Date();
+  if(tasks.tirzep && d.getDay()===5 && !medals.includes("Disciplina Hardcore")) medals.push("Disciplina Hardcore");
+  // dieta
+  if(tasks.meal && !medals.includes("Nutrição Perfeita")) medals.push("Nutrição Perfeita");
+  updateMedals();
+  updateStreak();
+}
+
+function updateMedals(){
+  const div=document.getElementById("medals");
+  div.innerHTML="";
+  medals.forEach(m=>{
+    div.innerHTML+=<span class="medalha">${m}</span>;
+  });
+}
+
+function updateStreak(){
+  const el=document.getElementById("streakProgress");
+  el.style.width=(streak*14.28)+'%'; // max 7 dias
+}
+
+// INICIALIZAÇÃO
+window.onload=()=>{
   load();
   checkDate();
-  setInterval(checkDate, 60*1000); // checa todo minuto se mudou o dia
+  setInterval(checkDate,60*1000);
 };
 </script>
 </body>
