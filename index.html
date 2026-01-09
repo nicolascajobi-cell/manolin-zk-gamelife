@@ -2,23 +2,232 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
-<!-- iOS FULLSCREEN -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="MANOLIN ZK">
-
-<title>MANOLIN ZK</title>
+<title>MANOLIN ZK RPG</title>
 
 <style>
-body {
-  background: #0f0f1a;
-  color: #fff;
-  font-family: Arial, sans-serif;
+html, body {
   margin: 0;
   padding: env(safe-area-inset-top) 20px 20px 20px;
+  height: 100%;
+  background: #0f0f1a;
+  color: #fff;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #f59e0b;
+}
+
+.card {
+  background: #1c1c2e;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  position: relative;
+}
+
+button {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  border-radius: 10px;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.bar {
+  background: #333;
+  height: 20px;
+  border-radius: 10px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #3b82f6;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.level {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #facc15;
+}
+
+.history {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 10px;
+}
+
+.notification {
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  background: #10b981;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.5s;
 }
 </style>
 </head>
+
+<body>
+<div id="app">
+  <h1>🎮 MANOLIN ZK RPG</h1>
+  <div class="level" id="levelTxt">Level 1 - XP 0/100</div>
+
+  <div class="card">
+    <h2>💧 Água - 3L</h2>
+    <p id="waterAmount">0 / 3000 ml</p>
+    <button onclick="addWater(250)">+250ml</button>
+    <button onclick="addWater(500)">+500ml</button>
+    <button onclick="addWater(1000)">+1L</button>
+    <div class="bar"><div id="waterBar" class="progress-bar"></div></div>
+    <div id="notifWater" class="notification">+XP!</div>
+  </div>
+
+  <div class="card">
+    <h2>🏋️ Treino Academia</h2>
+    <label><input type="checkbox" id="gymCheck" onchange="completeTask('gym')"> Fiz hoje</label>
+    <div id="notifGym" class="notification">+XP!</div>
+  </div>
+
+  <div class="card">
+    <h2>🥊 Boxe</h2>
+    <label><input type="checkbox" id="boxCheck" onchange="completeTask('box')"> Fiz hoje</label>
+    <div id="notifBox" class="notification">+XP!</div>
+  </div>
+
+  <div class="card">
+    <h2>🍽️ Dieta</h2>
+    <label><input type="checkbox" id="mealCheck" onchange="completeTask('meal')"> Fiz todas as refeições</label>
+    <div id="notifMeal" class="notification">+XP!</div>
+  </div>
+
+  <div class="card">
+    <h2>📜 Histórico</h2>
+    <div id="history" class="history"></div>
+  </div>
+</div>
+
+<script>
+// ---- VARIÁVEIS ----
+let water = 0;
+const maxWater = 3000;
+let xp = 0;
+let level = 1;
+let tasks = {gym:false, box:false, meal:false};
+let history = [];
+let lastDate = "";
+
+// ---- FUNÇÕES ----
+function showNotif(id) {
+  const el = document.getElementById(id);
+  el.style.opacity = 1;
+  setTimeout(()=>el.style.opacity=0, 1000);
+}
+
+function addXP(amount) {
+  xp += amount;
+  while(xp >= 100) {
+    level++;
+    xp -= 100;
+    showNotif('notifWater'); // efeito extra level up opcional
+  }
+  document.getElementById("levelTxt").innerText = `Level ${level} - XP ${xp}/100`;
+}
+
+function addWater(v) {
+  water += v;
+  if(water > maxWater) water = maxWater;
+  document.getElementById("waterAmount").innerText = `${water} / ${maxWater} ml`;
+  document.getElementById("waterBar").style.width = (water/maxWater*100)+'%';
+  addXP(5);
+  showNotif('notifWater');
+  save();
+}
+
+function completeTask(task) {
+  if(tasks[task] === false) {
+    tasks[task] = true;
+    addXP(20);
+    showNotif('notif'+task.charAt(0).toUpperCase()+task.slice(1));
+    save();
+  }
+}
+
+// ---- SALVAR E CARREGAR ----
+function save() {
+  localStorage.setItem('manolinZK', JSON.stringify({water,xp,level,tasks,history,lastDate}));
+}
+
+function load() {
+  const state = JSON.parse(localStorage.getItem('manolinZK'));
+  if(state) {
+    ({water,xp,level,tasks,history,lastDate} = state);
+    document.getElementById("waterAmount").innerText = `${water} / ${maxWater} ml`;
+    document.getElementById("waterBar").style.width = (water/maxWater*100)+'%';
+    document.getElementById("levelTxt").innerText = `Level ${level} - XP ${xp}/100`;
+    document.getElementById("gymCheck").checked = tasks.gym;
+    document.getElementById("boxCheck").checked = tasks.box;
+    document.getElementById("mealCheck").checked = tasks.meal;
+    updateHistory();
+  }
+}
+
+// ---- RESET DIÁRIO ----
+function checkDate() {
+  const today = new Date().toLocaleDateString();
+  if(today !== lastDate) {
+    if(lastDate) history.unshift({date:lastDate, water, tasks:{...tasks}});
+    if(history.length>7) history.pop();
+    water=0;
+    tasks={gym:false, box:false, meal:false};
+    lastDate = today;
+    save();
+    load();
+  }
+}
+
+// ---- HISTÓRICO ----
+function updateHistory() {
+  const hDiv = document.getElementById("history");
+  hDiv.innerHTML = "";
+  history.forEach(d=>{
+    hDiv.innerHTML += `<div>${d.date}: Água ${d.water}ml, Gym ${d.tasks.gym?'✔':'❌'}, Box ${d.tasks.box?'✔':'❌'}, Dieta ${d.tasks.meal?'✔':'❌'}</div>`;
+  });
+}
+
+// ---- INICIALIZAÇÃO ----
+window.onload = ()=>{
+  load();
+  checkDate();
+  setInterval(checkDate, 60*1000); // checa todo minuto se mudou o dia
+};
+</script>
+</body>
+</html>
