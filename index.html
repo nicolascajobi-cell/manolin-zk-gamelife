@@ -2,7 +2,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- iOS FULLSCREEN -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="MANOLIN ZK">
+
 <title>MANOLIN ZK</title>
 
 <style>
@@ -11,70 +18,7 @@ body {
   color: #fff;
   font-family: Arial, sans-serif;
   margin: 0;
-  padding: 20px;
-}
-
-.card {
-  background: #1c1c2e;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-button {
-  background: #7c3aed;
-  color: white;
-  border: none;
-  padding: 15px;
-  width: 100%;
-  border-radius: 10px;
-  font-size: 18px;
-}
-
-.bar {
-  background: #333;
-  height: 20px;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-#waterBar {
-  height: 100%;
-  width: 0%;
-  background: #3b82f6;
-  border-radius: 10px;
+  padding: env(safe-area-inset-top) 20px 20px 20px;
 }
 </style>
 </head>
-
-<body>
-
-<h1>🎮 MANOLIN ZK</h1>
-
-<div class="card">
-  <h2>💧 Água</h2>
-  <p id="waterAmount">0 / 3000 ml</p>
-  <button onclick="addWater()">+250ml</button>
-  <div class="bar">
-    <div id="waterBar"></div>
-  </div>
-</div>
-
-<script>
-let water = 0;
-const maxWater = 3000;
-
-function addWater() {
-  water += 250;
-  if (water > maxWater) water = maxWater;
-
-  document.getElementById("waterAmount").innerText =
-    water + " / " + maxWater + " ml";
-
-  document.getElementById("waterBar").style.width =
-    (water / maxWater) * 100 + "%";
-}
-</script>
-
-</body>
-</html>
